@@ -1,5 +1,6 @@
 # PrettyHierarchy
-Color your hierarchy objects in Unity.
+
+Color your hierarchy objects in Unity!
 
 Usage : Simply add a PrettyObject component to any of your GameObjects.
 
