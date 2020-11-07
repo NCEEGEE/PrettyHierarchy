@@ -1,5 +1,5 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEditor;
 
 namespace PrettyHierarchy
 {
@@ -30,5 +30,10 @@ namespace PrettyHierarchy
         public FontStyle FontStyle { get { return fontStyle; } }
         public TextAnchor Alignment { get { return alignment; } }
         public bool TextDropShadow { get { return textDropShadow; } }
+
+        private void OnValidate()
+        {
+            EditorApplication.RepaintHierarchyWindow();
+        }
     }
 }
