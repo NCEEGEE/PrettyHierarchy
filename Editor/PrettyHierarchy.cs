@@ -25,7 +25,7 @@ namespace PrettyHierarchy
                 if (prettyObject != null)
                 {
                     HierarchyItem item = new HierarchyItem(instanceID, selectionRect, prettyObject);
-                    PainBackground(item);
+                    PaintBackground(item);
                     PaintHoverOverlay(item);
                     PaintText(item);
                     PaintCollapseToggleIcon(item);
@@ -35,9 +35,18 @@ namespace PrettyHierarchy
             }
         }
 
-        private static void PainBackground(HierarchyItem item)
+        private static void PaintBackground(HierarchyItem item)
         {
-            Color32 color = item.IsSelected ? EditorColors.GetDefaultBackgroundColor(EditorUtils.IsHierarchyFocused, item.IsSelected) : item.PrettyObject.BackgroundColor;
+            Color32 color;
+            if (item.PrettyObject.UseDefaultBackgroundColor || item.IsSelected)
+            {
+                color = EditorColors.GetDefaultBackgroundColor(EditorUtils.IsHierarchyFocused, item.IsSelected);
+            }
+            else
+            {
+                color = item.PrettyObject.BackgroundColor;
+            }
+
             EditorGUI.DrawRect(item.BackgroundRect, color);
         }
 
@@ -51,7 +60,17 @@ namespace PrettyHierarchy
 
         private static void PaintText(HierarchyItem item)
         {
-            Color color = item.IsSelected ? EditorColors.GetDefaultTextColor(EditorUtils.IsHierarchyFocused, item.IsSelected) : item.PrettyObject.TextColor;
+            Color32 color;
+
+            if (item.PrettyObject.UseDefaultTextColor || item.IsSelected)
+            {
+                color = EditorColors.GetDefaultTextColor(EditorUtils.IsHierarchyFocused, item.IsSelected, item.GameObject.activeInHierarchy);
+            }
+            else
+            {
+                color = item.PrettyObject.TextColor;
+                color.a = item.GameObject.activeInHierarchy ? EditorColors.TextAlphaObjectEnabled : EditorColors.TextAlphaObjectDisabled;
+            }
 
             GUIStyle labelGUIStyle = new GUIStyle
             {
@@ -83,21 +102,40 @@ namespace PrettyHierarchy
 
                 string iconID = expandedIDs.Contains(item.InstanceID) ? "IN Foldout on" : "IN foldout";
 
-                GUI.DrawTexture(item.CollapseToggleIconRect, EditorGUIUtility.IconContent(iconID).image);
+                GUI.DrawTexture(item.CollapseToggleIconRect, EditorGUIUtility.IconContent(iconID).image, ScaleMode.StretchToFill, true, 0f, EditorColors.CollapseIconTintColor, 0f, 0f);
             }
         }
 
         private static void PaintPrefabIcon(HierarchyItem item)
         {
-            GUIContent content = EditorGUIUtility.ObjectContent(EditorUtility.InstanceIDToObject(item.InstanceID), null);
-            GUI.DrawTexture(item.PrefabIconRect, content.image);
+            Texture icon = EditorGUIUtility.ObjectContent(EditorUtility.InstanceIDToObject(item.InstanceID), null).image;
+
+            // The above does not account for the selection highlight, so we do it manually...
+            if (EditorUtils.IsHierarchyFocused && item.IsSelected)
+            {
+                if (icon.name == "d_Prefab Icon" || icon.name == "Prefab Icon")
+                {
+                    icon = EditorGUIUtility.IconContent("d_Prefab On Icon").image;
+                }
+                else if (icon.name == "GameObject Icon") // Dark theme is fine by default here...
+                {
+                    icon = EditorGUIUtility.IconContent("GameObject On Icon").image;
+                }
+            }
+
+            // Alpha of the icon is affected by the object's active/inactive state
+            Color color = item.GameObject.activeInHierarchy ? Color.white : new Color(1f, 1f, 1f, 0.5f);
+            
+            //GUI.DrawTexture(item.PrefabIconRect, tex, ScaleMode.StretchToFill, true, 0f, color, 0f, 0f);
+            GUI.DrawTexture(item.PrefabIconRect, icon, ScaleMode.StretchToFill, true, 0f, color, 0f, 0f);
         }
 
         private static void PaintEditPrefabIcon(HierarchyItem item)
         {
             if (PrefabUtility.GetCorrespondingObjectFromOriginalSource(item.GameObject) != null && PrefabUtility.IsAnyPrefabInstanceRoot(item.GameObject))
             {
-                GUI.DrawTexture(item.EditPrefabIconRect, EditorGUIUtility.IconContent("ArrowNavigationRight").image);
+                Texture icon = EditorGUIUtility.IconContent("ArrowNavigationRight").image;
+                GUI.DrawTexture(item.EditPrefabIconRect, icon, ScaleMode.StretchToFill, true, 0f, EditorColors.EditPrefabIconTintColor, 0f, 0f);
             }
         }
     }
