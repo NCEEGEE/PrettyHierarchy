@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace PrettyHierarchy
 {
-    [CanEditMultipleObjects]
     [CustomEditor(typeof(PrettyObject))]
     public class PrettyObjectEditor : Editor
     {
