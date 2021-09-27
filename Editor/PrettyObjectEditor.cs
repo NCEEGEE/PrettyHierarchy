@@ -3,21 +3,22 @@ using UnityEngine;
 
 namespace PrettyHierarchy
 {
-    [CustomEditor(typeof(PrettyObject))]
+    [CustomEditor(typeof(PrettyObject)), CanEditMultipleObjects]
     public class PrettyObjectEditor : Editor
     {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+
             EditorGUILayout.LabelField("Background");
 
             SerializedProperty useDefaultBackgroundColor = serializedObject.FindProperty("useDefaultBackgroundColor");
-            useDefaultBackgroundColor.boolValue = EditorGUILayout.Toggle("Use Default Color", useDefaultBackgroundColor.boolValue);
+            EditorGUILayout.PropertyField(useDefaultBackgroundColor, new GUIContent("Use Default Color"));
 
             if (!useDefaultBackgroundColor.boolValue)
             {
                 SerializedProperty backgroundColor = serializedObject.FindProperty("backgroundColor");
-                backgroundColor.colorValue = EditorGUILayout.ColorField("Background Color", backgroundColor.colorValue);
+                EditorGUILayout.PropertyField(backgroundColor);
             }
 
             EditorGUILayout.Space(7f);
@@ -25,16 +26,16 @@ namespace PrettyHierarchy
             EditorGUILayout.LabelField("Text");
 
             SerializedProperty useDefaultTextColor = serializedObject.FindProperty("useDefaultTextColor");
-            useDefaultTextColor.boolValue = EditorGUILayout.Toggle("Use Default Color", useDefaultTextColor.boolValue);
+            EditorGUILayout.PropertyField(useDefaultTextColor, new GUIContent("Use Default Color"));
 
             if (!useDefaultTextColor.boolValue)
             {
                 SerializedProperty textColor = serializedObject.FindProperty("textColor");
-                textColor.colorValue = EditorGUILayout.ColorField("Background Color", textColor.colorValue);
+                EditorGUILayout.PropertyField(textColor);
             }
 
             SerializedProperty font = serializedObject.FindProperty("font");
-            font.objectReferenceValue = EditorGUILayout.ObjectField("Font", font.objectReferenceValue, typeof(Font), false);
+            EditorGUILayout.PropertyField(font);
 
             SerializedProperty fontSize = serializedObject.FindProperty("fontSize");
             EditorGUILayout.PropertyField(fontSize);
@@ -46,7 +47,7 @@ namespace PrettyHierarchy
             EditorGUILayout.PropertyField(alignment);
 
             SerializedProperty dropShadow = serializedObject.FindProperty("textDropShadow");
-            dropShadow.boolValue = EditorGUILayout.Toggle("Drop Shadow", dropShadow.boolValue);
+            EditorGUILayout.PropertyField(dropShadow);
 
             serializedObject.ApplyModifiedProperties();
         }
